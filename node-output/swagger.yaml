@@ -1,0 +1,251 @@
+openapi: 3.0.0
+info:
+  title: Salesforce Cumulocity Integration
+  description: Salesforce Cumulocity Integration
+  version: 1.0.0
+servers:
+- url: https://virtserver.swaggerhub.com/Solenis/SF_C8Y_Intg/1.0.0
+  description: SwaggerHub API Auto Mocking
+security:
+- BearerAuth: []
+paths:
+  /v1/metadata:
+    get:
+      summary: Get Site & application structure metadata for a given customer and
+        sign-in user
+      description: Return array of  Site & its application structure for a given customer
+        and sign-in user
+      parameters:
+      - name: soldTo
+        in: query
+        description: represent customer.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+          example: 12897
+      responses:
+        "200":
+          description: Success-Successfully return metadata.
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                - siteId: 123
+                  siteName: Site 1
+                  deviceCount: 12
+                  siteUrl: http://cloud.iot.solenis/groupObject/123
+                  apps:
+                  - appId: 127890
+                    appName: Tank 1
+                    appPerformanceStatus: 1
+                  - appId: 127891
+                    appName: Tank 2
+                    appPerformanceStatus: 1
+                  - appId: 127892
+                    appName: Cooling tower
+                    appPerformanceStatus: 0
+                - siteId: 124
+                  siteName: Site 2
+                  deviceCount: 7
+                  siteUrl: http://cloud.iot.solenis/groupObject/124
+                  apps:
+                  - appId: 127995
+                    appName: Tank 4
+                    appPerformanceStatus: 1
+                  - appId: 127996
+                    appName: Tank 5
+                    appPerformanceStatus: 1
+                  - appId: 127997
+                    appName: Basement Cooling tower
+                    appPerformanceStatus: 1
+                items:
+                  $ref: '#/components/schemas/Site'
+        "204":
+          description: No data found.
+        "400":
+          description: BadRequest - Invalid payload in query parameters
+          content:
+            application/json:
+              schema:
+                maxLength: 200
+                pattern: "^[a-zA-Z0-9!@#$%^&*()-_+=\\[\\]{}|\\\\;:'\",./<>?]{0,200}$"
+                type: string
+                example: Payload data in body or in query parameters are not in correct
+                  format.
+        "401":
+          description: Unauthorized - missing/invalid token or no application access.
+          content:
+            application/json:
+              schema:
+                maxLength: 200
+                pattern: "^[a-zA-Z0-9!@#$%^&*()-_+=\\[\\]{}|\\\\;:'\",./<>?]{0,200}$"
+                type: string
+                example: Unauthorized - missing/invalid token or no app usage access.
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                maxLength: 200
+                pattern: "^[a-zA-Z0-9!@#$%^&*()-_+=\\[\\]{}|\\\\;:'\",./<>?]{0,200}$"
+                type: string
+                example: Endpoint Not Found.
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                maxLength: 200
+                pattern: "^[a-zA-Z0-9!@#$%^&*()-_+=\\[\\]{}|\\\\;:'\",./<>?]{0,200}$"
+                type: string
+                example: Error while processing backend logic.
+  /v1/appPerformanceScore:
+    get:
+      summary: Get application performance status for a given customer and sign-in
+        user
+      description: Return array of  application performance status for a given customer
+        and sign-in user
+      parameters:
+      - name: soldTo
+        in: query
+        description: represent customer.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+          example: 12897
+      responses:
+        "200":
+          description: Success-Successfully return application performance score status.
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                - appId: 127890
+                  appPerformanceStatus: 1
+                - appId: 127891
+                  appPerformanceStatus: 1
+                - appId: 127892
+                  appPerformanceStatus: 0
+                - appId: 127995
+                  appPerformanceStatus: 1
+                - appId: 127996
+                  appPerformanceStatus: 0
+                - appId: 127997
+                  appPerformanceStatus: 1
+                items:
+                  $ref: '#/components/schemas/AppPerformance'
+        "204":
+          description: No data found.
+        "400":
+          description: BadRequest - Invalid payload in query parameters
+          content:
+            application/json:
+              schema:
+                maxLength: 200
+                pattern: "^[a-zA-Z0-9!@#$%^&*()-_+=\\[\\]{}|\\\\;:'\",./<>?]{0,200}$"
+                type: string
+                example: Payload data in body or in query parameters are not in correct
+                  format.
+        "401":
+          description: Unauthorized - missing/invalid token or no application access.
+          content:
+            application/json:
+              schema:
+                maxLength: 200
+                pattern: "^[a-zA-Z0-9!@#$%^&*()-_+=\\[\\]{}|\\\\;:'\",./<>?]{0,200}$"
+                type: string
+                example: Unauthorized - missing/invalid token or no app usage access.
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                maxLength: 200
+                pattern: "^[a-zA-Z0-9!@#$%^&*()-_+=\\[\\]{}|\\\\;:'\",./<>?]{0,200}$"
+                type: string
+                example: Endpoint Not Found.
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                maxLength: 200
+                pattern: "^[a-zA-Z0-9!@#$%^&*()-_+=\\[\\]{}|\\\\;:'\",./<>?]{0,200}$"
+                type: string
+                example: Error while processing backend logic.
+components:
+  schemas:
+    Site:
+      required:
+      - deviceCount
+      - siteId
+      - siteName
+      - siteUrl
+      type: object
+      properties:
+        siteId:
+          type: integer
+          format: int64
+        siteName:
+          maxLength: 100
+          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+          type: string
+        deviceCount:
+          type: integer
+          format: int32
+        siteUrl:
+          maxLength: 100
+          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+          type: string
+        apps:
+          type: array
+          items:
+            $ref: '#/components/schemas/Application'
+      additionalProperties: false
+    Application:
+      required:
+      - appId
+      - appName
+      - appPerformanceStatus
+      type: object
+      properties:
+        appId:
+          type: integer
+          format: int64
+        appName:
+          maxLength: 100
+          pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+          type: string
+        appPerformanceStatus:
+          type: integer
+          description: "1 indicate green , 0 indicate red"
+          format: int32
+          example: 1
+      additionalProperties: false
+    AppPerformance:
+      required:
+      - appId
+      - appPerformanceStatus
+      type: object
+      properties:
+        appId:
+          type: integer
+          format: int64
+        appPerformanceStatus:
+          type: integer
+          description: "1 indicate green , 0 indicate red"
+          format: int32
+          example: 1
+      additionalProperties: false
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
